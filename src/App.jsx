@@ -119,6 +119,7 @@ function App() {
 
           //listener per ricevere le notifiche
           unsubscribe = onMessage(messaging, (payload) => {
+            console.log("notifica ricevuta", payload)
             new Notification(payload.notification.title, {
               body: payload.notification.body,
             });
@@ -223,13 +224,13 @@ function App() {
   )
 
 
-
+  //una colonna per mobile e due da laptop (lg) in su 
   return (
-    <div className="grid grid-cols-[1fr_4fr] grid-rows-[1fr_5fr_1fr] h-screen w-screen bg-gray-50 overflow-hidden">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_4fr] lg:grid-rows-[1fr_5fr_1fr] min-h-screen lg:h-screen overflow-auto lg:overflow-hidden">
 
-      <aside className="row-start-1 row-span-3 pr-3 flex flex-col">
+      <aside className="order-2 lg:col-start-1 lg:row-start-1 lg:row-span-3 pr-3 flex flex-col">
 
-        <div className="flex items-center justify-center bg-gray-900 p-6 ">
+        <div className="hidden lg:flex items-center justify-center bg-gray-900 p-6 ">
           <p className="text-white text-7xl text-[clamp(1rem,5vw,4rem)] whitespace-nowrap p-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] font-bold"> Easy Booking</p>
         </div>
 
@@ -265,7 +266,7 @@ function App() {
               </div>
             )}
 
-            <div className='bg-white flex flex-col p-4 rounded-lg  flex-1 min-h-0 mb-4 '>
+            <div className='flex bg-white flex-col p-4 rounded-lg  flex-1 min-h-0 mb-4  '>
               <p className='text-lg font-bold mb-2'>Le tue prenotazioni:</p>
               <div className='overflow-y-auto '>
                 {events.map((event, index) => (event.email === user.email &&
@@ -278,19 +279,19 @@ function App() {
         </div>
       </aside>
 
-      <header className="flex flex-col items-end p-1 gap-0.5">
+      <header className="order-4 flex flex-col items-end p-1 gap-0.5">
         {isOnline ? <p className="text-green-500">Online</p> : <p className="text-red-500">Offline</p>}
         {fromCache ? <p className="text-yellow-500">Dati presi dalla cache</p> : <p className="text-green-500">Dati presi dal server</p>}
         {pendingData ? <p className="text-yellow-500">Aggiornamenti non ancora sincronizzati</p> : <p className="text-green-500">Aggiornamenti sincronizzati</p>}
         {emailAdmin ? <p className="text-green-500">Connesso al calendario di {emailAdmin}</p> : <p className="text-red-500">Non connesso al calendario dell'host riesegui il login</p>}
       </header>
 
-      <main className="z-50 shadow-2xl h-full overflow-auto ">
+      <main className="order-1 lg:col-start-2 lg:row-start-2 z-50 shadow-2xl min-h-[500px] lg:h-full overflow-auto">
         {calendario}
       </main>
 
 
-      <div className="p-5 flex justify-end">
+      <div className="order-3 lg:col-start-2 lg:row-start-3 flex p-5 justify-end">
         <div className='bg-gray-900 flex items-center gap-4 p-4 rounded-xl'>
           <p className="text-white font-bold">{user?.email || 'Ospite'}</p>
 
@@ -300,7 +301,7 @@ function App() {
             Logout
           </button>
 
-          <div className="">
+          <div className="hidden lg:block">
             {admin ? <p className="text-white font-bold">Admin</p> : <p className="text-white font-bold">Ospite</p>}
           </div>
 
