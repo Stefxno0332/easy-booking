@@ -224,7 +224,7 @@ function App() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_4fr] lg:grid-rows-[1fr_5fr_1fr] min-h-screen lg:h-screen overflow-auto lg:overflow-hidden">
 
-      <aside className="order-2 lg:col-start-1 lg:row-start-1 lg:row-span-3 pr-3 flex flex-col">
+      <aside className="order-2 lg:col-start-1 lg:row-start-1 lg:row-span-3 lg:pr-3 flex flex-col">
 
         <div className="hidden lg:flex items-center justify-center bg-gray-900 p-6 ">
           <p className="text-white text-7xl text-[clamp(1rem,5vw,4rem)] whitespace-nowrap p-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] font-bold"> Easy Booking</p>
@@ -256,6 +256,7 @@ function App() {
                 <p className='text-md'>Inizio: {info.event.start?.toLocaleString()}</p>
                 <p className='text-md'>Fine: {info.event.end?.toLocaleString()}</p>
                 <p className='text-md'>Tipo prenotazione : {info.event.title || "Prenotazione"}</p>
+                {admin && <p className="text-md">Prenotato da: {events.find(event => event.id === info.event.id).email}</p>}
                 {admin && (
                   <button className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded text-sm font-medium transition-transform duration-150 active:scale-95" onClick={() => deletePrenotazione(info.event.id)}>Elimina</button>
                 )}
