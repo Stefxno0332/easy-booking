@@ -92,9 +92,7 @@ function App() {
           return
         }
 
-        // Importa messaging
-        const { messaging, getToken } = await import('./firebase');
-
+        // importato all'inizio del file
         if (!messaging) {
           console.log('messaging non inizializzato')
           return
@@ -102,11 +100,9 @@ function App() {
 
         if (user) {
 
-          //registro custom service worker
-          await navigator.serviceWorker.register('/firebase-messaging-sw.js'); //preso dalla root cioè public
-
-          //appena è stato installato correttamente ed è pronto
-          const registration = await navigator.serviceWorker.ready;
+          //registro custom service worker e uso direttamente il registration ritornato
+          //non uso navigator.serviceWorker.ready perché prende l'altro sw e si bugga
+          const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
 
           //collegamente e subscription automatica da firebase, ritorna il token
           const token = await getToken(messaging, { serviceWorkerRegistration: registration, vapidKey: "BM7nuFMryHNtgW4Fo37VmcVa58-FS2DkHQly_FFODtf744covpRAehzX_3SknBavnCrhTXdeJknUNbGat3jCg8c" })

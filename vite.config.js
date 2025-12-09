@@ -16,6 +16,9 @@ export default defineConfig({
           // Precaching automatico dei file build
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
 
+          // IMPORTANTE: Non intercettare le richieste FCM (firebase cloud messaging) (creava problemi con sw per le notifiche da firebase)
+          navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/],
+
           // Network First per Firebase
           runtimeCaching: [
             {
