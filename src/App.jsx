@@ -11,18 +11,33 @@ import './App.css'
 import Login from './login'
 import { AuthContext } from './Authenticate'
 import { onMessage } from 'firebase/messaging'
+import InfoIcon from './InfoIcon'
+
 
 
 
 function App() {
   const { user, admin, isOnline, emailAdmin } = useContext(AuthContext);
+
+  //array di eventi
   const [events, setEvents] = useState([]);
+
+  //pannello sopra con info sull'evento
   const [infoPanel, setInfoPanel] = useState(false);
+
+  //informazioni prese dal calendario che viene caricato da firestore
   const [info, setInfo] = useState({});
+
+  //pannello sotto con eventi
   const [eventPanel, setEventPanel] = useState(false);
+
+  //se i dati vengono dalla cache
   const [fromCache, setFromCache] = useState(false)
+
+  //Se ci sono dati che ancora dalla cache non sono stati scritti nel server
   const [pendingData, setPendingData] = useState(false)
 
+  //valori della prenotazione
   const title = useRef(null);
   const color = useRef(null);
 
@@ -181,11 +196,12 @@ function App() {
   }
 
   async function deletePrenotazione(id) {
+
+    setEventPanel(false) // Chiudi il pannello info perchè la risorsa sarà eliminata
     await deleteDoc(doc(db, "prenotazioni", id))
     // Ricarica le prenotazioni per aggiornare il calendario fatto i automatico da snapshot
     //await fetchPrenotazioni(user.email)
-    // Chiudi il pannello info
-    setEventPanel(false)
+
   }
 
   // Se l'utente non ha fatto l'accesso parte la schermata di login
@@ -222,7 +238,7 @@ function App() {
 
   //una colonna per mobile e due da laptop (lg) in su 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_4fr] lg:grid-rows-[1fr_5fr_1fr] min-h-screen lg:h-screen overflow-auto lg:overflow-hidden">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_4fr] lg:grid-rows-[1fr_7fr_1fr] min-h-screen lg:h-screen overflow-auto lg:overflow-hidden">
 
       <aside className="order-2 lg:col-start-1 lg:row-start-1 lg:row-span-3 lg:pr-3 flex flex-col">
 
@@ -256,10 +272,8 @@ function App() {
                 <p className='text-md'>Inizio: {info.event.start?.toLocaleString()}</p>
                 <p className='text-md'>Fine: {info.event.end?.toLocaleString()}</p>
                 <p className='text-md'>Tipo prenotazione : {info.event.title || "Prenotazione"}</p>
-                {admin && <p className="text-md">Prenotato da: {events.find(event => event.id === info.event.id).email}</p>}
-                {admin && (
-                  <button className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded text-sm font-medium transition-transform duration-150 active:scale-95" onClick={() => deletePrenotazione(info.event.id)}>Elimina</button>
-                )}
+                {admin && events.find(event => event.id === info.event.id) && <p className="text-md">Prenotato da: {events.find(event => event.id === info.event.id).email}</p>}
+                {admin && <button className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded text-sm font-medium transition-transform duration-150 active:scale-95" onClick={() => deletePrenotazione(info.event.id)}>Elimina</button>}
               </div>
             )}
 
@@ -276,11 +290,8 @@ function App() {
         </div>
       </aside>
 
-      <header className="order-4 flex flex-col items-end p-1 gap-0.5">
-        {isOnline ? <p className="text-green-500">Online</p> : <p className="text-red-500">Offline</p>}
-        {fromCache ? <p className="text-yellow-500">Dati presi dalla cache</p> : <p className="text-green-500">Dati presi dal server</p>}
-        {pendingData ? <p className="text-yellow-500">Aggiornamenti non ancora sincronizzati</p> : <p className="text-green-500">Aggiornamenti sincronizzati</p>}
-        {emailAdmin ? <p className="text-green-500">Connesso al calendario di {emailAdmin}</p> : <p className="text-red-500">Non connesso al calendario dell'host riesegui il login</p>}
+      <header className="order-3 p-3 gap-0.5">
+        {InfoIcon({ isOnline, fromCache, pendingData, emailAdmin })}
       </header>
 
       <main className="order-1 lg:col-start-2 lg:row-start-2 z-50 shadow-2xl min-h-[500px] lg:h-full overflow-auto">
@@ -288,7 +299,7 @@ function App() {
       </main>
 
 
-      <div className="order-3 lg:col-start-2 lg:row-start-3 flex p-5 justify-end">
+      <div className="order-4 lg:col-start-2 lg:row-start-3 flex p-1 lg:p-3 justify-end">
         <div className='bg-gray-900 flex items-center gap-4 p-4 rounded-xl'>
           <p className="text-white font-bold">{user?.email || 'Ospite'}</p>
 

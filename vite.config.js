@@ -10,16 +10,17 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA(
-      {
+      {  //service worker che si occupa delle cache per uso offline e per la pwa
         registerType: 'autoUpdate',
         workbox: {
           // Precaching automatico dei file build
+          // quando l'utente visita per la prima volta l'app il sw scarica e salva questi dati in cache per maggiore velocità (salva la parte statica)
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
 
           // IMPORTANTE: Non intercettare le richieste FCM (firebase cloud messaging) (creava problemi con sw per le notifiche da firebase)
           navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/],
 
-          // Network First per Firebase
+          // Network First per Firebase (questi dati vengono prima richiesti dal server se non ci sono prende dalla cache)
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
@@ -32,7 +33,7 @@ export default defineConfig({
                 }
               }
             },
-            // Cache First per immagini che non ci sono al momento
+            // Cache First per immagini che non ci sono al momento (questi dati vengono prima presi dalla cache, se non ci sono dal server)
             {
               urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
               handler: 'CacheFirst',
@@ -51,7 +52,7 @@ export default defineConfig({
           short_name: 'SAW',
           description: 'SAW',
           theme_color: '#000000',
-          icons: [
+          icons: [ //icone generate con nano banana
             {
               src: '/icons/icon-192x192.png',
               sizes: '192x192',
@@ -63,7 +64,7 @@ export default defineConfig({
               type: 'image/png',
             },
           ],
-          screenshots: [
+          screenshots: [ //schreenshot mostrati quando si scarica la pwa
             {
               src: '/screenshot-wide-new.png',
               sizes: '1280x720',
