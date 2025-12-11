@@ -10,6 +10,15 @@ Gestisci le tue prenotazioni in modo veloce e facile.
 - Tailwind
 - Reactbits
 
+# Account di prova
+
+- email : prova@gmail.com
+- password : 123456
+
+- email : prova2@gmail.com
+- password : 123456
+
+
 # Guida all'uso:
 ![alt text](image.png)
 - La schermata iniziale permette di accedere al proprio account o di crearne uno nuovo.
