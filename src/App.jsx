@@ -37,6 +37,9 @@ function App() {
   //Se ci sono dati che ancora dalla cache non sono stati scritti nel server
   const [pendingData, setPendingData] = useState(false)
 
+  //token per le notifiche verrà registrato su firestore
+  const [token, setNotificationToken] = useState(null)
+
   //valori della prenotazione
   const title = useRef(null);
   const color = useRef(null);
@@ -120,13 +123,22 @@ function App() {
           const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
 
           //collegamente e subscription automatica da firebase, ritorna il token
-          const token = await getToken(messaging, { serviceWorkerRegistration: registration, vapidKey: "BM7nuFMryHNtgW4Fo37VmcVa58-FS2DkHQly_FFODtf744covpRAehzX_3SknBavnCrhTXdeJknUNbGat3jCg8c" })
+          const newToken = await getToken(messaging, { serviceWorkerRegistration: registration, vapidKey: "BM7nuFMryHNtgW4Fo37VmcVa58-FS2DkHQly_FFODtf744covpRAehzX_3SknBavnCrhTXdeJknUNbGat3jCg8c" })
+          //aggiorno lo stato del token con quello nuovo
+          setNotificationToken(newToken)
 
-          console.log("token", token)
+          console.log("token", newToken)
           console.log("user email", user.email)
-          // tocken salvato su firestore per inviare notifiche al dispositivo dopo che si è registrato
-          //ci possono essere più token per un utente se accede con più dispositivi
-          await setDoc(doc(db, 'users', user.email, 'tokens', token), { token: token });
+
+          if (newToken && user.email) {
+            // tocken salvato su firestore per inviare notifiche al dispositivo dopo che si è registrato
+            //ci possono essere più token per un utente se accede con più dispositivi
+            // se la collezione non esiste la crea
+            // se gli passo lo stato token non lo trova per via dell'asincronicità
+            await setDoc(doc(db, 'users', user.email, 'tokens', newToken), { token: newToken });
+          } else {
+            console.log("Token o email non validi")
+          }
 
           //listener per ricevere le notifiche
           unsubscribe = onMessage(messaging, (payload) => {
@@ -174,7 +186,22 @@ function App() {
     setInfoPanel(false)
   }
 
+  async function handleLogout() {
+    console.log("Logout")
 
+    //elimino il token al momento del logout
+    console.log("eliminazione token :" + token)
+
+    //l'eliminazione è asincrona devo usare async e await
+    await deleteDoc(doc(db, 'users', user.email, 'tokens', token))
+    setNotificationToken(null)
+
+    //eseguo il logout
+    signOut(auth)
+
+  }
+
+  //uso async perchè dentro c'è una funzione asincrona
   async function setPrenotazione(email, backgroundColor, end, start, title) {
     // Se è una prenotazione per un solo giorno, imposto end alla fine del giorno
     if (end.getTime() === start.getTime()) {
@@ -304,7 +331,7 @@ function App() {
           <p className="text-white font-bold">{user?.email || 'Ospite'}</p>
 
           <button
-            onClick={() => signOut(auth)}
+            onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium transition-transform duration-150 active:scale-95">
             Logout
           </button>
